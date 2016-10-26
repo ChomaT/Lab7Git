@@ -248,6 +248,71 @@ void scale(int numdata, int *array, double factor, int numfile)
 }
 
 
+void center(int numdata, int *array, double avg, int numfile)
+{
+	double outarray[50];
+	int i;
+	char outstr[50];
+	FILE *fp;
+
+	for(i = 0; i < numdata; i++)
+	{
+		outarray[i] = (double)array[i] - avg;
+	}
+
+	//saving
+	sprintf(outstr, "Centered_data_%d.txt", numfile);
+	fp = fopen(outstr, "w");
+	if(fp == NULL)
+	{
+		perror("\n!!!Error opening writing file!!!\n");
+	}
+	else
+	{
+		fprintf(fp, "%d %lf\n", numdata, avg);
+		for(i = 0; i < numdata; i++)
+		{
+			fprintf(fp, "%lf\n", outarray[i]);
+		}
+	}
+	fclose(fp);
+}
+
+
+
+
+
+void normal(int numdata, int *array, int max, int numfile)
+{
+	double outarray[50];
+	int i;
+	char outstr[50];
+	FILE *fp;
+
+	for(i = 0; i < numdata; i++)
+	{
+			outarray[i] = (double)array[i] / (double) max;
+	}
+
+	//saving Normal
+	sprintf(outstr, "Normalized_data_%d.txt", numfile);
+	fp = fopen(outstr, "w");
+	if(fp == NULL)
+	{
+			perror("\n!!!Error opening writing file!!!\n");
+	}
+	else
+	{
+			fprintf(fp, "%d %d\n", numdata, max);
+			for(i = 0; i < numdata; i++)
+			{
+					fprintf(fp, "%lf\n", outarray[i]);
+			}
+	}
+	fclose(fp);
+}
+
+
 
 
 
