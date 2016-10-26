@@ -21,22 +21,24 @@ class Signal{
 	public:
 		Signal();		// default constructor.
 		Signal(int);	// parametric constructor file number
-                Signal(string);         //parametric constructor file name
+        Signal(string);         //parametric constructor file name
 		~Signal();		// destructor
-                int* Offset(int*);
-                int* Scale(int*);
-                int* Center(int*);
-                int*  Normalize(int*);
+                void Offset();
+                void Scale();
+                void Center();
+                void Normalize();
                 void Statistics();
                 void Sig_info();
-                void Save_file();
+                void Save_file(string);
 };
+
+
 
 Signal::Signal(){
 	length = 0;
 	max = 0;
 	avg = 0;
-	data = int[];
+	data = new int[100];
         
         int i = 0, sum = 0;
         
@@ -47,15 +49,15 @@ Signal::Signal(){
 	fpointer.open("Raw_data_01.txt", ios::in);
 	if (fpointer.is_open())
 	{
-		fread();
+		//fread();
 		//for(int i = 0; i < length; i++)
-                while(!fpointer.eof())
+        while(!fpointer.eof())
 		{
                     
 			fpointer >> data[i];
                         i++;
 		}
-
+        		fpointer.close();
                 length = i;
 	}
 
@@ -78,25 +80,27 @@ Signal::Signal(){
 
 }
 
+
+
 Signal::Signal(int L){
 	int i = 0, sum = 0;
 	length = 0;
         max = 0;
         avg = 0;
-	data = int[];
+	data = new int[100];
 	if(data == NULL)
 		cerr << "Error in memory allocation";
 
 	ifstream fpointer;
 	if ( L < 10)
-            fpointer.open("Raw_data_0" + string(itoa(L)) +  ".txt", ios::in);
+            fpointer.open("Raw_data_0" + string(std::itoa(L)) +  ".txt", ios::in);
 	else
-            fpointer.open("Raw_data_" + string(itoa(L)) +  ".txt", ios::in);
+            fpointer.open("Raw_data_" + string(std::itoa(L)) +  ".txt", ios::in);
         
         
         if (fpointer.is_open())
 	{
-		fread();
+		//fread();
 		//for(int i = 0; i < length; i++)
                 while(!fpointer.eof())
 		{
@@ -105,6 +109,7 @@ Signal::Signal(int L){
                         i++;
 		}
 
+                fpointer.close();
                 length = i;
 	}
 
@@ -128,12 +133,14 @@ Signal::Signal(int L){
 	cout << "\nParametric constructor, length =  " << length << "max = " << max << "average = " << avg << endl;
 }
 
+
+
 Signal::Signal(string instr){
 	int i = 0, sum = 0;
 	length = 0;
         max = 0;
         avg = 0;
-	data = int[];
+	data = new int[100];
 	if(data == NULL)
 		cerr << "Error in memory allocation";
 
@@ -143,7 +150,7 @@ Signal::Signal(string instr){
         
         if (fpointer.is_open())
 	{
-		fread();
+		//fread();
 		//for(int i = 0; i < length; i++)
                 while(!fpointer.eof())
 		{
@@ -151,11 +158,9 @@ Signal::Signal(string instr){
 			fpointer >> data[i];
                         i++;
 		}
-
+                fpointer.close();
                 length = i;
 	}
-
-
 
 	//Define max
 	max = data[0];
@@ -181,147 +186,148 @@ Signal::~Signal(){
 
 
 
-int* Signal::Offset(int* array)
+void Signal::Offset()
 {
-	double outarray[50];
 	int i, factor;
-	char outstr[50];
-        
+
         cout << "Input an offset factor: ";
         cin >> factor;
         
 	for(i = 0; i < length; i++)
 	{
-		outarray[i] = (double)array[i] + factor;
+		data[i] = (double)data[i] + factor;
+	}
+}
+
+
+
+
+
+void Signal::Scale()
+{
+	int i, factor;
+
+	cout << "Input a scaling factor: ";
+	cin >> factor;
+
+	for(i = 0; i < length; i++)
+	{
+		data[i] = (double)data[i] * factor;
 	}
 
-	//saving
-	sprintf(outstr, "Offset_data_%d.txt", numfile);
-	fp = fopen(outstr, "w");
-	if(fp == NULL)
+}
+
+
+void Signal::Center()
+{
+	int i;
+
+	for(i = 0; i < length; i++)
 	{
-		perror("\n!!!Error opening writing file!!!\n");
+		data[i] = (double)data[i] - avg;
 	}
-	else
+}
+
+
+
+
+
+void Signal::Normalize()
+{
+	int i;
+
+	for(i = 0; i < length; i++)
 	{
-		fprintf(fp, "%d %lf\n", numdata, factor);
-		for(i = 0; i < numdata; i++)
+			data[i] = (double)data[i] / (double) max;
+	}
+
+}
+
+
+void Signal::Sig_info()
+{
+	cout<<"Length: " << length << "Max: " << max << "Average: " << avg << endl;
+}
+
+void Signal::Save_file(string outstr)
+{
+	//outstr = outstr + ".txt";
+	fstream outstream;
+	outstream.open (outstr + ".txt");
+	outstream << length << max << "\n";
+	for(int i = 0; i < length; i++)
+	{
+		outstream << data[i] << "\n";
+	}
+	outstream.close();
+}
+
+
+
+
+
+int main(int argc, char *argv[]) {
+	int i = 0, fnum, choice = 0;
+	string fname, outname;
+	Signal *sig2;
+
+	if(argv[0][1] == 'n')
 		{
-			fprintf(fp, "%lf\n", outarray[i]);
+			fnum = atoi(argv[i+1]);
+			Signal sig1(fnum);
+			sig2 = new Signal(fnum);
+		}
+	else if(argv[0][1] == 'f')
+		{
+			fname == argv[i+1];
+			Signal sig1(fname);
+			sig2 = new Signal(fname);
+		}
+	else
+		{
+			Signal sig1();
+			sig2 = new Signal();
+		}
+
+	while(choice != 7)
+	{
+		cout << "Make an operation choice: "
+				"1. Offset"
+				"2. Scale"
+				"3. Center"
+				"4. Normalize"
+				"5. Print Info"
+				"6. Save Data"
+				"7. Quit" << endl;
+		cin >> choice;
+
+		if(choice == 1)
+		{
+			sig2->Offset();
+		}
+		else if(choice == 2)
+		{
+			sig2->Scale();
+		}
+		else if(choice == 3)
+		{
+			sig2->Center();
+		}
+		else if(choice == 4)
+		{
+			sig2->Normalize();
+		}
+		else if(choice == 5)
+		{
+			sig2->Sig_info();
+		}
+		else if(choice == 6)
+		{
+			cout << "Please input desired output name without extension: ";
+			cin >> outname;
+			sig2->Save_file(outname);
 		}
 	}
-	fclose(fp);
-}
 
-
-
-
-
-void scale(int numdata, int *array, double factor, int numfile)
-{
-	double outarray[50];
-	int i;
-	char outstr[50];
-	FILE *fp;
-
-	for(i = 0; i < numdata; i++)
-	{
-		outarray[i] = (double)array[i] * factor;
-	}
-
-	//saving
-	sprintf(outstr, "Scaled_data_%d.txt", numfile);
-	fp = fopen(outstr, "w");
-	if(fp == NULL)
-	{
-		perror("\n!!!Error opening writing file!!!\n");
-	}
-	else
-	{
-		fprintf(fp, "%d %lf\n", numdata, factor);
-		for(i = 0; i < numdata; i++)
-		{
-			fprintf(fp, "%lf\n", outarray[i]);
-		}
-	}
-	fclose(fp);
-}
-
-
-void center(int numdata, int *array, double avg, int numfile)
-{
-	double outarray[50];
-	int i;
-	char outstr[50];
-	FILE *fp;
-
-	for(i = 0; i < numdata; i++)
-	{
-		outarray[i] = (double)array[i] - avg;
-	}
-
-	//saving
-	sprintf(outstr, "Centered_data_%d.txt", numfile);
-	fp = fopen(outstr, "w");
-	if(fp == NULL)
-	{
-		perror("\n!!!Error opening writing file!!!\n");
-	}
-	else
-	{
-		fprintf(fp, "%d %lf\n", numdata, avg);
-		for(i = 0; i < numdata; i++)
-		{
-			fprintf(fp, "%lf\n", outarray[i]);
-		}
-	}
-	fclose(fp);
-}
-
-
-
-
-
-void normal(int numdata, int *array, int max, int numfile)
-{
-	double outarray[50];
-	int i;
-	char outstr[50];
-	FILE *fp;
-
-	for(i = 0; i < numdata; i++)
-	{
-			outarray[i] = (double)array[i] / (double) max;
-	}
-
-	//saving Normal
-	sprintf(outstr, "Normalized_data_%d.txt", numfile);
-	fp = fopen(outstr, "w");
-	if(fp == NULL)
-	{
-			perror("\n!!!Error opening writing file!!!\n");
-	}
-	else
-	{
-			fprintf(fp, "%d %d\n", numdata, max);
-			for(i = 0; i < numdata; i++)
-			{
-					fprintf(fp, "%lf\n", outarray[i]);
-			}
-	}
-	fclose(fp);
-}
-
-
-
-
-
-
-
-
-
-
-int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-	return 0;
+	delete sig2;
 }
