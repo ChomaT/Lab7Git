@@ -1,0 +1,5 @@
+Building file: ../src/Lab7.cpp
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/Lab7.d" -MT"src/Lab7.d" -o "src/Lab7.o" "../src/Lab7.cpp"
+/bin/sh: g++: command not found
+make: *** [src/Lab7.o] Error 127
