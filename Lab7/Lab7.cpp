@@ -10,6 +10,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -90,7 +91,7 @@ Signal::Signal(int L){
         avg = 0;
 	data = new int[100];
         string fname;
-        char* str;
+        char str[25] = {'\0'};
         
         
 	if(data == NULL)
@@ -107,7 +108,8 @@ Signal::Signal(int L){
 	}
         else
         {
-            fname = "Raw_data_" + sprintf(str,"%d",L) +  ".txt";
+            sprintf(str,"Raw_data_0%d.txt",L);
+            fname = str;
             fpointer.open(fname.c_str(), ios::in);
         }
         
@@ -306,14 +308,14 @@ int main(int argc, char *argv[]) {
 
 	while(choice != 7)
 	{
-		cout << "Make an operation choice: "
-				"1. Offset"
-				"2. Scale"
-				"3. Center"
-				"4. Normalize"
-				"5. Print Info"
-				"6. Save Data"
-				"7. Quit" << endl;
+		cout << "\nMake an operation choice: "
+				"\n1. Offset"
+				"\n2. Scale"
+				"\n3. Center"
+				"\n4. Normalize"
+				"\n5. Print Info"
+				"\n6. Save Data"
+				"\n7. Quit" << endl;
 		cin >> choice;
 
 		if(choice == 1)
